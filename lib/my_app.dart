@@ -1,70 +1,76 @@
 import 'package:flutter/material.dart';
-import 'package:wallet_tracker/currency_converter.dart';
 import 'package:wallet_tracker/expense_tracker.dart';
+import 'package:wallet_tracker/payments.dart';
+import 'package:wallet_tracker/report.dart';
+import 'package:wallet_tracker/settings.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  int _selectedIndex = 0;
+  static final List<Widget> _widgetOptions = <Widget>[
+    const ExpenseTrackerApp(),
+    const Report(),
+    const Payments(),
+    const Settings(),
+  ];
+
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+        brightness: Brightness.dark,
+      ),
       debugShowCheckedModeBanner: false,
-      home: DefaultTabController(
-        length: 2,
-        child: Scaffold(
+      home: Scaffold(
           appBar: AppBar(
             title: const Text("My App"),
-            titleTextStyle:const TextStyle(fontStyle: FontStyle.italic),
             actions: [
-              IconButton(onPressed: (){}, icon: const Icon(Icons.search))
+              IconButton(onPressed: (){}, icon: const Icon(Icons.notifications))
             ],
-            bottom: const TabBar(
-              tabs: [
-                Tab(icon: Icon(Icons.wallet)),
-                Tab(icon: Icon(Icons.currency_exchange))
-              ],
-            ),
           ),
-          body: TabBarView(
-              children: [
-                ExpenseTrackerApp(),
-                CurrencyConverterApp(),
-              ]
+          body: Center(
+            child: _widgetOptions.elementAt(_selectedIndex),
           ),
-          drawer: Drawer(
-            child: ListView(
-              children:[
-                const UserAccountsDrawerHeader(
-                    accountName:Text("Nguyen Anh Duc") ,
-                    accountEmail:Text("ducna0412@gmail.com"),
-                    currentAccountPicture: CircleAvatar(),
-                ),
-                ListTile(
-                  title: Text("Wallet"),
-                  leading: Icon(Icons.wallet),
-                  onTap: (){
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  title: Text("Converter"),
-                  leading: Icon(Icons.currency_exchange),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  title: Text("Setting"),
-                  leading: Icon(Icons.settings),
-                  onTap: (){
-                    Navigator.pop(context);
-                  },
-                )
-              ],
-            ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.account_balance_wallet),
+                label: 'Wallet',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.bar_chart),
+                label: 'Report',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.payments),
+                label: 'Budget',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings),
+                label: 'Settings'
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            backgroundColor: Colors.black,
+            selectedItemColor: Colors.cyanAccent,
+            unselectedItemColor: Colors.grey ,
+            onTap: _onItemTapped,
           ),
         ),
-      ),
-    );
+      );
     }
-  }
+}

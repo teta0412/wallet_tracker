@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:wallet_tracker/components/adding_box.dart';
+import 'package:wallet_tracker/components/top_card.dart';
+import 'components/expense.dart';
 
-class Expense {
-  final String title;
-  final double amount;
-
-  Expense(this.title, this.amount);
-}
 
 class ExpenseTrackerApp extends StatefulWidget {
   const ExpenseTrackerApp({super.key});
@@ -17,8 +14,22 @@ class ExpenseTrackerApp extends StatefulWidget {
 class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
   final List<Expense> _expenses = [];
 
-  TextEditingController _titleController = TextEditingController();
+  TextEditingController  _titleController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
+
+  void createBoxExpense(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return AddingBox(
+              title: _titleController,
+              amount: _amountController,
+              onSave: addExpense,
+              onCancel: cancelAddingExpense,
+          );
+        }
+    );
+  }
 
   void addExpense(){
     final title = _titleController.text;
@@ -32,6 +43,21 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
         _amountController.clear();
       });
     }
+    Navigator.of(context).pop();
+  }
+
+  void cancelAddingExpense(){
+    _titleController.clear();
+    _amountController.clear();
+    Navigator.of(context).pop();
+  }
+
+  String totalExpense(){
+    double balance =0;
+    for (var i = 0; i < _expenses.length ; i++ ){
+      balance += _expenses[i].amount;
+    }
+    return balance.toStringAsFixed(2);
   }
 
   @override
@@ -39,26 +65,12 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        // appBar: AppBar(
-        //   title: Text('Expense Tracker'),
-        // ),
         body: Column(
           children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  TextField(
-                    controller: _titleController,
-
-                  ),
-                  TextField(
-                    controller: _amountController,
-                    keyboardType: TextInputType.number,
-                  )
-                ],
-              ),
+            TopCard(
+                balance: '100',
+                income: '100',
+                expense: totalExpense(),
             ),
             Expanded(
                 child: ListView.builder(
@@ -66,14 +78,12 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
                   itemBuilder: (ctx,index){
                     return Card(
                       elevation: 2,
-                      margin: EdgeInsets.symmetric(vertical: 5 , horizontal: 10),
+                      margin:const EdgeInsets.symmetric(vertical: 5 , horizontal: 10),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          child: Text('\$${_expenses[index].amount.toStringAsFixed(2)}'),
-                        ),
                         title: Text(_expenses[index].title),
+                        subtitle: Text('\$${_expenses[index].amount.toStringAsFixed(2)}'),
                         trailing: IconButton(
-                          icon: Icon(Icons.delete),
+                          icon: const Icon(Icons.delete),
                           onPressed: (){
                             setState(() {
                               _expenses.removeAt(index);
@@ -88,8 +98,9 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-            onPressed: addExpense,
-            child: const Icon(Icons.add)
+            onPressed: createBoxExpense,
+            child: const Icon(Icons.add),
+
         ),
       ),
     );
