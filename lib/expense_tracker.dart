@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wallet_tracker/components/adding_box.dart';
 import 'package:wallet_tracker/components/top_card.dart';
-import 'components/expense.dart';
+import 'components/transaction.dart';
 
 
 class ExpenseTrackerApp extends StatefulWidget {
@@ -12,51 +12,88 @@ class ExpenseTrackerApp extends StatefulWidget {
 }
 
 class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
-  final List<Expense> _expenses = [];
+  List <Transaction> transactions = [];
 
-  TextEditingController  _titleController = TextEditingController();
-  TextEditingController _amountController = TextEditingController();
+  final TextEditingController  _transactionNameController = TextEditingController();
+  final TextEditingController _transactionAmountController = TextEditingController();
+  String _transactionStatusController ='';
 
   void createBoxExpense(){
     showDialog(
         context: context,
         builder: (context){
           return AddingBox(
-              title: _titleController,
-              amount: _amountController,
-              onSave: addExpense,
-              onCancel: cancelAddingExpense,
+              title: _transactionNameController,
+              amount: _transactionAmountController,
+              onSave: addTransaction,
+              onCancel: cancelAddingTransaction,
+              expenseOrIncome:(selectedCategory){
+                _transactionStatusController = selectedCategory;
+              },
           );
         }
     );
   }
 
-  void addExpense(){
-    final title = _titleController.text;
-    final amount = double.parse(_amountController.text);
+  void addTransaction(){
+    final title = _transactionNameController.text;
+    final amount = double.parse(_transactionAmountController.text);
+    final status = _transactionStatusController;
 
 
     if (title.isNotEmpty && amount > 0){
       setState(() {
-        _expenses.add(Expense(title, amount));
-        _titleController.clear();
-        _amountController.clear();
+        transactions.add(Transaction(transactionName: title, money: amount, expenseOrIncome: status));
+        _transactionNameController.clear();
+        _transactionAmountController.clear();
       });
     }
     Navigator.of(context).pop();
   }
 
-  void cancelAddingExpense(){
-    _titleController.clear();
-    _amountController.clear();
+  void cancelAddingTransaction(){
+    _transactionNameController.clear();
+    _transactionAmountController.clear();
     Navigator.of(context).pop();
+  }
+
+  String totalIncome(){
+    double balance =0;
+    for (var i = 0; i < transactions.length ; i++ ){
+      if (transactions[i].expenseOrIncome == 'income')
+      {
+        balance += transactions[i].money;
+      }
+    }
+    return balance.toStringAsFixed(2);
   }
 
   String totalExpense(){
     double balance =0;
-    for (var i = 0; i < _expenses.length ; i++ ){
-      balance += _expenses[i].amount;
+    for (var i = 0; i < transactions.length ; i++ ){
+      if (transactions[i].expenseOrIncome == 'expense')
+        {
+          balance += transactions[i].money;
+        }
     }
+    return balance.toStringAsFixed(2);
+  }
+
+  String totalBalance(){
+    double income =0 , expense =0 ,balance =0;
+    for (var i = 0; i < transactions.length ; i++ ){
+      if (transactions[i].expenseOrIncome == 'income')
+        {
+          income += transactions[i].money;
+        }
+    }
+    for (var i = 0; i < transactions.length ; i++ ){
+      if (transactions[i].expenseOrIncome == 'expense')
+        {
+          expense += transactions[i].money;
+        }
+    }
+    balance = income -expense;
     return balance.toStringAsFixed(2);
   }
 
@@ -68,39 +105,28 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
         body: Column(
           children: <Widget>[
             TopCard(
-                balance: '100',
-                income: '100',
+                balance: totalBalance(),
+                income: totalIncome(),
                 expense: totalExpense(),
             ),
             Expanded(
                 child: ListView.builder(
-                  itemCount: _expenses.length,
-                  itemBuilder: (ctx,index){
-                    return Card(
-                      elevation: 2,
-                      margin:const EdgeInsets.symmetric(vertical: 5 , horizontal: 10),
-                      child: ListTile(
-                        title: Text(_expenses[index].title),
-                        subtitle: Text('\$${_expenses[index].amount.toStringAsFixed(2)}'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: (){
-                            setState(() {
-                              _expenses.removeAt(index);
-                            });
-                          },
-                        ),
-                      ),
-                    );
-                  },
+                    itemCount: transactions.length,
+                    itemBuilder: (ctx,index) {
+                      return Transaction(
+                          transactionName: transactions[index].transactionName,
+                          money: transactions[index].money,
+                          expenseOrIncome: transactions[index].expenseOrIncome,
+                      );
+                    }
                 )
             )
           ],
         ),
         floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.grey.shade600,
             onPressed: createBoxExpense,
             child: const Icon(Icons.add),
-
         ),
       ),
     );
