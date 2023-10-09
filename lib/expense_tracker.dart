@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:wallet_tracker/components/adding_box.dart';
 import 'package:wallet_tracker/components/top_card.dart';
+import 'package:wallet_tracker/my_app.dart';
 import 'components/transaction.dart';
+
 
 
 class ExpenseTrackerApp extends StatefulWidget {
@@ -12,51 +13,7 @@ class ExpenseTrackerApp extends StatefulWidget {
 }
 
 class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
-  List <Transaction> transactions = [];
-
-  final TextEditingController  _transactionNameController = TextEditingController();
-  final TextEditingController _transactionAmountController = TextEditingController();
-  String _transactionStatusController ='';
-
-  void createBoxExpense(){
-    showDialog(
-        context: context,
-        builder: (context){
-          return AddingBox(
-              title: _transactionNameController,
-              amount: _transactionAmountController,
-              onSave: addTransaction,
-              onCancel: cancelAddingTransaction,
-              expenseOrIncome:(selectedCategory){
-                _transactionStatusController = selectedCategory;
-              },
-          );
-        }
-    );
-  }
-
-  void addTransaction(){
-    final title = _transactionNameController.text;
-    final amount = double.parse(_transactionAmountController.text);
-    final status = _transactionStatusController;
-
-
-    if (title.isNotEmpty && amount > 0){
-      setState(() {
-        transactions.add(Transaction(transactionName: title, money: amount, expenseOrIncome: status));
-        _transactionNameController.clear();
-        _transactionAmountController.clear();
-      });
-    }
-    Navigator.of(context).pop();
-  }
-
-  void cancelAddingTransaction(){
-    _transactionNameController.clear();
-    _transactionAmountController.clear();
-    Navigator.of(context).pop();
-  }
-
+  final List<Transaction> transactions = [];
   String totalIncome(){
     double balance =0;
     for (var i = 0; i < transactions.length ; i++ ){
@@ -122,11 +79,6 @@ class _ExpenseTrackerAppState extends State<ExpenseTrackerApp> {
                 )
             )
           ],
-        ),
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.grey.shade600,
-            onPressed: createBoxExpense,
-            child: const Icon(Icons.add),
         ),
       ),
     );

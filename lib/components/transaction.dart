@@ -11,6 +11,7 @@ class Transaction extends StatelessWidget {
     required this.expenseOrIncome,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return Padding(

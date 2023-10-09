@@ -23,7 +23,6 @@ class AddingBox extends StatefulWidget {
 class _AddingBoxState extends State<AddingBox> {
   String selectedCategory = '' ;
 
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
