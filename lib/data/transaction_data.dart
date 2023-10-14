@@ -16,7 +16,7 @@ class TransData extends ChangeNotifier {
         balance += allTransList[i].money;
       }
     }
-    return balance.toStringAsFixed(2);
+    return balance.toString();
   }
 
   String totalExpense(){
@@ -27,7 +27,7 @@ class TransData extends ChangeNotifier {
         balance += allTransList[i].money;
       }
     }
-    return balance.toStringAsFixed(2);
+    return balance.toString();
   }
 
   String totalBalance(){
@@ -45,14 +45,18 @@ class TransData extends ChangeNotifier {
       }
     }
     balance = income -expense;
-    return balance.toStringAsFixed(2);
+    return balance.toString();
   }
   void addNewTrans (Transaction newTrans){
     allTransList.add(newTrans);
     notifyListeners();
   }
-  void deleteExpense(Transaction trans) {
+  void deleteTrans(Transaction trans) {
     allTransList.remove(trans);
+    notifyListeners();
+  }
+  void deleteAllTrans(){
+    allTransList.removeRange(0, allTransList.length);
     notifyListeners();
   }
 

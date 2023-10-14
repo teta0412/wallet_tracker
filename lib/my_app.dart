@@ -1,5 +1,6 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wallet_tracker/data/transaction_data.dart';
 import 'package:wallet_tracker/homepage.dart';
 import 'package:wallet_tracker/payments.dart';
@@ -37,84 +38,6 @@ class _MyAppState extends State<MyApp> {
   final TextEditingController _transactionAmountController = TextEditingController();
   String _transactionStatusController ='';
 
-  void createBoxExpense(){
-    showDialog(
-        context: context,
-        builder: (context){
-          return AddingBox(
-            title: _transactionNameController,
-            amount: _transactionAmountController,
-            onSave: addTransaction,
-            onCancel: cancelAddingTransaction,
-            expenseOrIncome:(selectedCategory){
-              _transactionStatusController = selectedCategory;
-            },
-          );
-        }
-    );
-  }
-
-
-  void addTransaction(){
-    final title = _transactionNameController.text;
-    final amount = double.parse(_transactionAmountController.text);
-    final status = _transactionStatusController;
-
-    if (title.isNotEmpty && amount > 0){
-      setState(() {
-        transactions.add(Transaction(transactionName: title, money: amount, expenseOrIncome: status));
-        _transactionNameController.clear();
-        _transactionAmountController.clear();
-      });
-    }
-    Navigator.of(context).pop();
-  }
-
-  void cancelAddingTransaction(){
-    _transactionNameController.clear();
-    _transactionAmountController.clear();
-    Navigator.of(context).pop();
-  }
-  String totalIncome(){
-    double balance =0;
-    for (var i = 0; i < transactions.length ; i++ ){
-      if (transactions[i].expenseOrIncome == 'income')
-      {
-        balance += transactions[i].money;
-      }
-    }
-    return balance.toStringAsFixed(2);
-  }
-
-  String totalExpense(){
-    double balance =0;
-    for (var i = 0; i < transactions.length ; i++ ){
-      if (transactions[i].expenseOrIncome == 'expense')
-      {
-        balance += transactions[i].money;
-      }
-    }
-    return balance.toStringAsFixed(2);
-  }
-
-  String totalBalance(){
-    double income =0 , expense =0 ,balance =0;
-    for (var i = 0; i < transactions.length ; i++ ){
-      if (transactions[i].expenseOrIncome == 'income')
-      {
-        income += transactions[i].money;
-      }
-    }
-    for (var i = 0; i < transactions.length ; i++ ){
-      if (transactions[i].expenseOrIncome == 'expense')
-      {
-        expense += transactions[i].money;
-      }
-    }
-    balance = income -expense;
-    return balance.toStringAsFixed(2);
-  }
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -124,36 +47,62 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        theme: ThemeData(
-          primarySwatch: Colors.blueGrey,
-        ),
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-            body: Center(
-              child:_widgetOptions.elementAt(_selectedIndex),
+    return Consumer<TransData>(
+      builder: (context , value , child) => Scaffold(
+              body: Center(
+                child:_widgetOptions.elementAt(_selectedIndex),
+              ),
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.grey.shade500,
+                onPressed: (){
+                  showDialog(
+                      context: context,
+                      builder: (context){
+                        return AddingBox(
+                          title: _transactionNameController,
+                          amount: _transactionAmountController,
+                          onSave: (){
+                            final title = _transactionNameController.text;
+                            final amount = int.parse(_transactionAmountController.text);
+                            final status = _transactionStatusController;
+                            final trans = context.read<TransData>();
+                            if (title.isNotEmpty && amount > 0){
+                                trans.addNewTrans(Transaction(transactionName: title, money: amount, expenseOrIncome: status));
+                                _transactionNameController.clear();
+                                _transactionAmountController.clear();
+                            }
+                            Navigator.of(context).pop();
+                          },
+                          onCancel: (){
+                            _transactionNameController.clear();
+                            _transactionAmountController.clear();
+                            Navigator.of(context).pop();
+                          },
+                          expenseOrIncome:(selectedCategory){
+                            _transactionStatusController = selectedCategory;
+                          },
+                        );
+                      }
+                  );
+                },
+                child: const Icon(Icons.add,size: 25),
             ),
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: Colors.grey.shade600,
-              onPressed: createBoxExpense,
-              child: const Icon(Icons.add,size: 25),
-          ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-            bottomNavigationBar: AnimatedBottomNavigationBar(
-              icons: iconList,
-              activeIndex: _selectedIndex,
-              activeColor: primary,
-              splashColor: secondary,
-              inactiveColor: Colors.black.withOpacity(0.5),
-              gapLocation: GapLocation.center,
-              leftCornerRadius: 0,
-              iconSize: 25,
-              rightCornerRadius: 0,
-              notchSmoothness: NotchSmoothness.softEdge,
-              onTap: _onItemTapped,
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+              bottomNavigationBar: AnimatedBottomNavigationBar(
+                icons: iconList,
+                activeIndex: _selectedIndex,
+                activeColor: primary,
+                splashColor: secondary,
+                inactiveColor: Colors.black.withOpacity(0.5),
+                gapLocation: GapLocation.center,
+                leftCornerRadius: 0,
+                iconSize: 25,
+                rightCornerRadius: 0,
+                notchSmoothness: NotchSmoothness.softEdge,
+                onTap: _onItemTapped,
+              ),
             ),
-          ),
-        );
+          );
 
     }
 }

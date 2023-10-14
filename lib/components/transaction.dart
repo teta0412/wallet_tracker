@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Transaction extends StatelessWidget {
   final String transactionName;
-  final double money;
+  final int money;
   final String expenseOrIncome;
 
   const Transaction({super.key,
