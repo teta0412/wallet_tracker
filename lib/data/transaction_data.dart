@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:wallet_tracker/components/transaction.dart';
 
@@ -8,7 +9,7 @@ class TransData extends ChangeNotifier {
     return allTransList;
   }
 
-  String totalIncome(){
+  double totalIncome(){
     double balance =0;
     for (var i = 0; i < allTransList.length ; i++ ){
       if (allTransList[i].expenseOrIncome == 'income')
@@ -16,10 +17,10 @@ class TransData extends ChangeNotifier {
         balance += allTransList[i].money;
       }
     }
-    return balance.toString();
+    return balance;
   }
 
-  String totalExpense(){
+  double totalExpense(){
     double balance =0;
     for (var i = 0; i < allTransList.length ; i++ ){
       if (allTransList[i].expenseOrIncome == 'expense')
@@ -27,10 +28,10 @@ class TransData extends ChangeNotifier {
         balance += allTransList[i].money;
       }
     }
-    return balance.toString();
+    return balance;
   }
 
-  String totalBalance(){
+  double totalBalance(){
     double income =0 , expense =0 ,balance =0;
     for (var i = 0; i < allTransList.length ; i++ ){
       if (allTransList[i].expenseOrIncome == 'income')
@@ -45,7 +46,7 @@ class TransData extends ChangeNotifier {
       }
     }
     balance = income -expense;
-    return balance.toString();
+    return balance;
   }
   void addNewTrans (Transaction newTrans){
     allTransList.add(newTrans);

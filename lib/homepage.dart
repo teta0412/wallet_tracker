@@ -22,9 +22,9 @@ class _HomepageState extends State<Homepage> {
           body: Column(
             children: <Widget>[
               TopCard(
-                balance: context.read<TransData>().totalBalance(),
-                income: context.read<TransData>().totalIncome(),
-                expense: context.read<TransData>().totalExpense(),
+                balance: context.read<TransData>().totalBalance().toString(),
+                income: context.read<TransData>().totalIncome().toString(),
+                expense: context.read<TransData>().totalExpense().toString(),
               ),
               Expanded(
                   child: ListView.builder(

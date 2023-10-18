@@ -20,7 +20,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
-  List<Transaction> transactions =[];
   static final List<Widget> _widgetOptions = <Widget>[
     const Homepage(),
     const Report(),
